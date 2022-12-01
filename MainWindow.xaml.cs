@@ -122,7 +122,7 @@ namespace ScriptVsNewWindow
             if (SetScripts.SelectedIndex == 0)
             {
                 LogEvent($"Start Loading Scripts");
-                await newWebView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("alert('NewWindowRequested')");
+                await newWebView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("console.log('NewWindowRequested')");
                 LogEvent($"Completed Loading Scripts");
             }
 
