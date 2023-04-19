@@ -61,24 +61,25 @@ namespace ScriptVsNewWindow {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;html&gt;
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///
+        ///&lt;html&gt;
         ///&lt;head&gt;
-        ///&lt;title&gt;test&lt;/title&gt;
-        ///&lt;script type=&quot;text/javascript&quot;&gt;
-        ///	var openedWindow;
-        ///	
-        ///	console.log(window[&apos;TESTDATA&apos;])
-        ///	
-        ///	function openWindow() {
-        ///	  openedWindow = window.open(&apos;https://ian.bebbs.co.uk&apos;)
-        ///	  console.log(&apos;window opened&apos;)
-        ///	  console.log(openedWindow[&apos;TESTDATA&apos;])
-        ///	}
+        ///    &lt;title&gt;test&lt;/title&gt;
+        ///    &lt;script type=&quot;text/javascript&quot;&gt;
+        ///        var openedWindow;
+        ///
+        ///        console.log(window[&apos;TESTDATA&apos;])
+        ///
+        ///        function openWindow() {
+        ///            openedWindow = window.open(&apos;https://ian.bebbs.co.uk&apos;)
+        ///            console.log(&apos;window opened&apos;)
+        ///            console.log(openedWindow[&apos;TESTDATA&apos;])
+        ///        }
         ///
         ///        function openNewWithJSOnly() {
         ///            let newWindow = window.open(&apos;about:blank&apos;);
-        ///            newWindow.console.log(&apos;!!! document is being updated by parent window !!!&apos;)
-        ///            let button = newWin [rest of string was truncated]&quot;;.
+        ///            newWindow.console.log(&apos;!!! d [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string OpenWindow {
             get {

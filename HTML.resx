@@ -117,44 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="OpenWindow" xml:space="preserve">
-    <value>&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;test&lt;/title&gt;
-&lt;script type="text/javascript"&gt;
-	var openedWindow;
-	
-	console.log(window['TESTDATA'])
-	
-	function openWindow() {
-	  openedWindow = window.open('https://ian.bebbs.co.uk')
-	  console.log('window opened')
-	  console.log(openedWindow['TESTDATA'])
-	}
-
-        function openNewWithJSOnly() {
-            let newWindow = window.open('about:blank');
-            newWindow.console.log('!!! document is being updated by parent window !!!')
-            let button = newWindow.document.createElement('button');
-            button.id = 'new-tab-button'
-            button.onclick = function () { window.open('https://ian.bebbs.co.uk'); };
-            button.textContent = "Open Tab1"
-            newWindow.document.body.appendChild(button);
-            let div = newWindow.document.createElement('div');
-            div.id = 'new-tab-div'
-            div.innerText = 'This content is generated purely by javascript';
-            newWindow.document.body.appendChild(div);
-            newWindow.document.title = 'Title set by javascript';
-            newWindow.console.log('!!! document has been updated by parent window !!!')
-        }
-&lt;/script&gt;
-&lt;/head&gt;
-&lt;body&gt;
-&lt;h1&gt;hello world&lt;/h1&gt;
-&lt;P&gt;&lt;button onclick="openWindow()"&gt;Open Window From Javascript&lt;/button&gt;&lt;/P&gt;
-&lt;P&gt;&lt;button onclick="openNewWithJSOnly()"&gt;Open Window From Javascript without navigation&lt;/button&gt;&lt;/P&gt;
-&lt;P&gt;&lt;A target="_blank" href="https://ian.bebbs.co.uk"&gt;Open Window From Target="_blank"&lt;/A&gt;&lt;/P&gt;
-&lt;/body&gt;
-&lt;/html&gt;</value>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="OpenWindow" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>openwindow.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>
