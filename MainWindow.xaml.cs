@@ -3,9 +3,12 @@ using Microsoft.Web.WebView2.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace ScriptVsNewWindow
 {
@@ -15,32 +18,45 @@ namespace ScriptVsNewWindow
     public partial class MainWindow : Window
     {
         private readonly ObservableCollection<string> log = new();
+        private readonly CoreWebView2CreationProperties webView2CreationProperties;
 
-        private bool enableLog = false;
+        private bool enableLog = true;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public MainWindow()
         {
             InitializeComponent();
 
+            this.webView2CreationProperties = new CoreWebView2CreationProperties()
+            {
+                BrowserExecutableFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Microsoft\Edge SxS\Application\114.0.1803.0"),
+                AdditionalBrowserArguments = "--auto-open-devtools-for-tabs",
+            };
+
             _ = InitializeAsync();
         }
 
-        public ICollection<string> Log => this.log;
+        public ObservableCollection<string> Log => this.log;
 
         private async Task InitializeAsync()
         {
-            await WebView.EnsureCoreWebView2Async();
+            this.WebView.CreationProperties = this.webView2CreationProperties;
+            await this.WebView.EnsureCoreWebView2Async();
+            await this.WebView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("console.log('script injected')");
 
-            WebView.CoreWebView2.NewWindowRequested += CoreWebView2_NewWindowRequested;
-            WebView.CoreWebView2.NavigationCompleted += CoreWebView2_NavigationCompleted;
-            WebView.NavigateToString(HTML.OpenWindow);
+            this.WebView.CoreWebView2.NewWindowRequested += CoreWebView2_NewWindowRequested;
+            this.WebView.CoreWebView2.NavigationCompleted += CoreWebView2_NavigationCompleted;
+            this.WebView.NavigateToString(HTML.OpenWindow);
+            LogEvent($"Using WebView2 version {this.WebView.CoreWebView2.Environment.BrowserVersionString}");
         }
 
         private void LogEvent(string @event)
         {
             if (this.enableLog)
             {
-                log.Add($"[{DateTime.Now.ToString("hh:mm:ss.ffff")}] {@event}");
+                this.log.Add($"[{DateTime.Now.ToString("hh:mm:ss.ffff")}] {@event}");
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Log)));
             }
         }
 
@@ -69,9 +85,9 @@ namespace ScriptVsNewWindow
         {
             var _deferral = e.GetDeferral();
 
-            if (ScheduleNewWindow.IsChecked == true)
+            if (this.ScheduleNewWindow.IsChecked == true)
             {
-                _ = this.Dispatcher.InvokeAsync(() => OpenNewWindowAsync(e, _deferral));
+                _ = Dispatcher.InvokeAsync(() => OpenNewWindowAsync(e, _deferral));
             }
             else
             {
@@ -83,50 +99,57 @@ namespace ScriptVsNewWindow
         {
             Window window = new Window
             {
-                Width = this.Width,
-                Height = this.Height,
-                Left = this.Left + 100,
-                Top = this.Top + 100
+                Width = Width,
+                Height = Height,
+                Left = Left + 100,
+                Top = Top + 100
             };
             var newWebView = new WebView2();
+            newWebView.CreationProperties = this.webView2CreationProperties;
 
             window.Content = newWebView;
             window.Show();
 
             await newWebView.EnsureCoreWebView2Async();
+            LogEvent($"Creating new WebView2 version {newWebView.CoreWebView2.Environment.BrowserVersionString}");
 
             newWebView.CoreWebView2.NewWindowRequested += CoreWebView2_NewWindowRequested;
             newWebView.CoreWebView2.NavigationStarting += CoreWebView2_NavigationStarting;
             newWebView.CoreWebView2.NavigationCompleted += CoreWebView2_NavigationCompleted;
             newWebView.CoreWebView2.ContentLoading += CoreWebView2_ContentLoading;
 
-            if (SetScripts.SelectedIndex == 1)
+            if (this.SetScripts.SelectedIndex == 1)
             {
                 LogEvent($"Start Loading Scripts");
-                await newWebView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("alert('NewWindowRequested')");
+                await newWebView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("console.log('script injected - before setting NewWindow')");
+                if (this.Delay.SelectedIndex > 0)
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(1000 * this.Delay.SelectedIndex));
+                }
                 LogEvent($"Completed Loading Scripts");
             }
 
-            if (SetNewWindow.IsChecked == true)
+
+            if (this.SetNewWindow.IsChecked == true)
             {
                 LogEvent($"Assigning NewWindow");
                 e.NewWindow = newWebView.CoreWebView2;
                 LogEvent($"Assigned NewWindow");
             }
 
-            if (Delay.SelectedIndex > 0)
-            {
-                await Task.Delay(TimeSpan.FromMilliseconds(1000 * Delay.SelectedIndex));
-            }
 
-            if (SetScripts.SelectedIndex == 0)
+            if (this.SetScripts.SelectedIndex == 0)
             {
                 LogEvent($"Start Loading Scripts");
-                await newWebView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("console.log('NewWindowRequested')");
+                await newWebView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("console.log('script injected - after setting NewWindow')");
+                if (this.Delay.SelectedIndex > 0)
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(1000 * this.Delay.SelectedIndex));
+                }
                 LogEvent($"Completed Loading Scripts");
             }
 
-            if (SetSource.IsChecked == true)
+            if (this.SetSource.IsChecked == true)
             {
                 LogEvent($"Setting Source - '{e.Uri}'");
                 newWebView.Source = new Uri(e.Uri);
@@ -152,6 +175,20 @@ namespace ScriptVsNewWindow
         private void ClearLog_Click(object sender, RoutedEventArgs e)
         {
             this.log.Clear();
+        }
+
+        private void TextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter && sender is TextBox textBox &&
+                (Uri.TryCreate(textBox.Text, UriKind.Absolute, out var uri) || Uri.TryCreate($"https://{textBox.Text}", UriKind.Absolute, out uri)))
+            {
+                this.WebView.CoreWebView2.Navigate(uri.AbsoluteUri);
+            }
+        }
+
+        private void OpenDefaultHomepage(object sender, RoutedEventArgs e)
+        {
+            this.WebView.NavigateToString(HTML.OpenWindow);
         }
     }
 }

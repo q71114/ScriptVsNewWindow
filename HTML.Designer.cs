@@ -74,12 +74,11 @@ namespace ScriptVsNewWindow {
         ///	  console.log(&apos;window opened&apos;)
         ///	  console.log(openedWindow[&apos;TESTDATA&apos;])
         ///	}
-        ///&lt;/script&gt;
-        ///&lt;/head&gt;
-        ///&lt;body&gt;
-        ///&lt;h1&gt;hello world&lt;/h1&gt;
-        ///&lt;P&gt;&lt;button onclick=&quot;openWindow()&quot;&gt;Open Window From Javascript&lt;/button&gt;&lt;/P&gt;
-        ///&lt;P&gt;&lt;A target=&quot;_blank&quot; href=&quot;https://ian.bebbs.co.uk&quot;&gt;Open Window From Target=&quot;_blank&quot;&lt;/A&gt;&lt;/P&gt; [rest of string was truncated]&quot;;.
+        ///
+        ///        function openNewWithJSOnly() {
+        ///            let newWindow = window.open(&apos;about:blank&apos;);
+        ///            newWindow.console.log(&apos;!!! document is being updated by parent window !!!&apos;)
+        ///            let button = newWin [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string OpenWindow {
             get {
