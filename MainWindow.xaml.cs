@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,14 +30,24 @@ namespace ScriptVsNewWindow
         {
             InitializeComponent();
 
+            var executablePath = GetCanaryWebViewPathIfAvailable();
             this.webView2CreationProperties = new CoreWebView2CreationProperties()
             {
-                BrowserExecutableFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Microsoft\Edge SxS\Application\114.0.1803.0"),
                 AdditionalBrowserArguments = "--auto-open-devtools-for-tabs",
             };
+            if (executablePath != null)
+            {
+                this.webView2CreationProperties.BrowserExecutableFolder = executablePath;
+            }
 
             _ = InitializeAsync();
         }
+
+        private string? GetCanaryWebViewPathIfAvailable() =>
+            Directory
+                .EnumerateDirectories(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Microsoft\Edge SxS\Application"), "*", SearchOption.TopDirectoryOnly)
+                .Where(path => Version.TryParse(Path.GetFileName(path), out _))
+                .FirstOrDefault();
 
         public ObservableCollection<string> Log => this.log;
 
@@ -114,10 +125,10 @@ namespace ScriptVsNewWindow
                 this.WebView.CoreWebView2.DOMContentLoaded -= CoreWebView2_DOMContentLoaded;
 
                 this.WebView.CoreWebView2.ExecuteScriptAsync("""
-                    console.log('blabla', window)
                     if (window.location.href === 'https://lite.duckduckgo.com/lite') {
                         const form = document.getElementsByTagName('form')[0]
                         form.setAttribute('target', '_blank')
+                        form.setAttribute('rel', 'opener')
                         document.querySelectorAll('input[class="query"]')[0].value = 'test'
                         form.submit()
                     }
