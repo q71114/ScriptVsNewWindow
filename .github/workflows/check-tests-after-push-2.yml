@@ -10,4 +10,4 @@ jobs:
     if: ${{ contains(github.event.pull_request.body, '- [x] Run automated nightly tests') }}
     steps:
       - run: |
-          Write-Host "Nightly tests"
+          Write-Host "Nightly test"

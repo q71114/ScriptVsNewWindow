@@ -9,4 +9,4 @@ jobs:
     runs-on: windows-2022
     steps:
       - run: |
-          Write-Host "Integration tests"
+          Write-Host "Integration test"
