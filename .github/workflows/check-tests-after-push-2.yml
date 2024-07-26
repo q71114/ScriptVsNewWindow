@@ -7,7 +7,7 @@ on:
 jobs:
   nightly-ui-tests:
     runs-on: windows-2022
-    if: ${{ contains(github.event.pull_request.body, '- [x] Run automated nightly tests') }}
     steps:
       - run: |
-          Write-Host "Nightly tests"
+          Write-Host "${{ github.event_name }}"
+          Write-Host "${{ github.event.action }}"
