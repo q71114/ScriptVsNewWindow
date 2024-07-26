@@ -10,3 +10,4 @@ jobs:
     steps:
       - run: |
           Write-Host "${{ github.event_name }}"
+          Write-Host "${{ github.event.type }}"
