@@ -1,0 +1,21 @@
+name: "[Check] Run tests after push"
+
+on:
+  push:
+    branches: '**'
+  issue_comment:                                     
+    types: [created, edited, deleted]
+
+jobs:
+  integration-tests:
+    runs-on: windows-2022
+    steps:
+      - run: |
+          Write-Host "Integration Tests"
+
+  nightly-ui-tests:
+    runs-on: windows-2022
+    if: ${{ always() && github.event.issue.pull_request && contains(github.event.comment.body, '/run nightly tests') }}
+    steps:
+      - run: |
+          Write-Host "Nightly Tests"
