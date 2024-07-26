@@ -7,7 +7,6 @@ on:
 jobs:
   nightly-ui-tests:
     runs-on: windows-2022
-    if: ${{ github.event_name == 'edited' }}
     steps:
       - run: |
-          Write-Host "Nightly test"
+          Write-Host "${{ github.event_name }}"
