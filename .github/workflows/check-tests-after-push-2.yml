@@ -10,4 +10,4 @@ jobs:
     steps:
       - run: |
           Write-Host "${{ github.event_name }}"
-          Write-Host "${{ github.event.pull_request.action }}"
+          Write-Host "${{ github.event.action }}"
