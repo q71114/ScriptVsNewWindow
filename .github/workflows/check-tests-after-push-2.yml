@@ -1,0 +1,13 @@
+name: "[Check] Run tests after push"
+
+on:
+  pull_request:
+    types: [opened, reopened, edited]
+
+jobs:
+  nightly-ui-tests:
+    runs-on: windows-2022
+    if: ${{ contains(github.event.pull_request.body, '- [x] Run automated nightly tests') }}
+    steps:
+      - run: |
+          Write-Host "Nightly tests"
