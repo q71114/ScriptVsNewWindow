@@ -11,11 +11,11 @@ jobs:
     runs-on: windows-2022
     steps:
       - run: |
-          Write-Host "Integration Tests"
+          Write-Host "Integration tests"
 
   nightly-ui-tests:
     runs-on: windows-2022
     if: ${{ always() && github.event.issue.pull_request && contains(github.event.comment.body, '/run nightly tests') }}
     steps:
       - run: |
-          Write-Host "Nightly Tests"
+          Write-Host "Nightly tests"
